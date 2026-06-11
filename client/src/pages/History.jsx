@@ -88,7 +88,7 @@ export default function History() {
                   </div>
                 )}
                 <div className="hcard-footer">
-                  <span className="hcard-date">{new Date(item.created_at).toLocaleString('zh-CN')}</span>
+                  <span className="hcard-date">{new Date(item.created_at + 'Z').toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}</span>
                   <button className="btn btn-danger hcard-del" onClick={(e) => handleDelete(item.id, e)}>删除</button>
                 </div>
               </Link>
