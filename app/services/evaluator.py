@@ -181,6 +181,26 @@ async def run_evaluation(evaluation_id: int, db: AsyncSession):
         ev.updated_at = datetime.utcnow()
         await db.commit()
 
+        # Parse documents if not yet done
+        if not ev.extracted_text:
+            from pathlib import Path
+            from app.services.parser import parse_document, truncate_text
+            file_paths = [fp.strip() for fp in (ev.file_path or "").split("\n") if fp.strip()]
+            merged_parts = []
+            for fp in file_paths:
+                ext = Path(fp).suffix.lstrip(".").lower()
+                try:
+                    text, _ = await parse_document(fp, ext)
+                    if text.strip():
+                        merged_parts.append(text.strip())
+                except Exception as e:
+                    logger.warning(f"[eval:{evaluation_id}] Parse failed for {fp}: {e}")
+            merged_text = truncate_text("\n\n---\n\n".join(merged_parts))
+            ev.extracted_text = merged_text
+            ev.text_length = len(merged_text)
+            await db.commit()
+            logger.info(f"[eval:{evaluation_id}] Parsed {len(file_paths)} file(s), {ev.text_length} chars")
+
         llm = LLMClient()
         ev.llm_provider = llm.provider
         ev.llm_model = llm.model

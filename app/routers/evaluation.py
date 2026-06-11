@@ -19,7 +19,6 @@ from app.schemas.evaluation import (
     UploadResponse,
     ScoreDimensionResult,
 )
-from app.services.parser import parse_document
 from app.services.evaluator import run_evaluation
 
 router = APIRouter(prefix="/evaluations", tags=["evaluations"])
@@ -69,38 +68,18 @@ async def upload_evaluation(
         if first_filename is None:
             first_filename = file.filename
 
-    # Parse all files and merge text
-    merged_parts = []
-    primary_path = saved_paths[0][0]
     primary_ext = saved_paths[0][1]
-
-    for file_path, ext, original_name in saved_paths:
-        try:
-            text, _ = await parse_document(file_path, ext)
-            if text.strip():
-                header = f"【文件：{original_name}】" if len(files) > 1 else ""
-                merged_parts.append((header + "\n" + text).strip())
-        except Exception as e:
-            for p, _, _ in saved_paths:
-                if os.path.exists(p):
-                    os.remove(p)
-            raise HTTPException(status_code=422, detail=f"{original_name} 解析失败: {e}")
-
-    merged_text = "\n\n---\n\n".join(merged_parts)
-    from app.services.parser import truncate_text
-    merged_text = truncate_text(merged_text)
-
-    # Project name: stem of first file
+    all_file_paths = "\n".join(p[0] for p in saved_paths)
     project_name = Path(first_filename or "未知项目").stem
     original_filenames = " + ".join(p[2] for p in saved_paths)
 
     ev = Evaluation(
         project_name=project_name,
         original_filename=original_filenames,
-        file_path=primary_path,
+        file_path=all_file_paths,
         file_type=primary_ext,
-        extracted_text=merged_text,
-        text_length=len(merged_text),
+        extracted_text="",
+        text_length=0,
         status="pending",
     )
     db.add(ev)
@@ -200,11 +179,14 @@ async def delete_evaluation(evaluation_id: int, db: AsyncSession = Depends(get_d
         raise HTTPException(status_code=404, detail="评估记录不存在")
 
     # Delete uploaded file
-    if ev.file_path and os.path.exists(ev.file_path):
-        try:
-            os.remove(ev.file_path)
-        except OSError:
-            pass
+    if ev.file_path:
+        for fp in ev.file_path.split("\n"):
+            fp = fp.strip()
+            if fp and os.path.exists(fp):
+                try:
+                    os.remove(fp)
+                except OSError:
+                    pass
 
     await db.delete(ev)
     await db.commit()
