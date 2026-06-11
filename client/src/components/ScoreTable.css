@@ -1,0 +1,203 @@
+.score-table {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ══ 总分英雄块 ══ */
+.final-hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  border-radius: 14px;
+  flex-wrap: wrap;
+}
+
+.final-num {
+  font-size: 72px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -3px;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.final-right {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.final-pts {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.final-badge {
+  font-size: 15px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.final-label-cn {
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* 进度条在右侧 */
+.final-bar-wrap {
+  flex: 1;
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-self: center;
+}
+
+.final-bar-track {
+  height: 8px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.final-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1s ease;
+}
+
+.final-bar-hint {
+  font-size: 11px;
+  opacity: 0.6;
+  text-align: right;
+}
+
+/* ══ 2×2 维度卡网格 ══ */
+.score-dims-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 520px) {
+  .score-dims-grid { grid-template-columns: 1fr; }
+}
+
+.sdim-card {
+  padding: 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--dc);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sdim-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sdim-icon { font-size: 18px; line-height: 1; flex-shrink: 0; }
+
+.sdim-name {
+  font-size: 14px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.sdim-score-num {
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.sdim-max {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.sdim-bar-track {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.sdim-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.9s ease;
+}
+
+.sdim-tier-badge {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1px solid;
+}
+
+.sdim-reasoning {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ── 加分项/扣分项 解析渲染 ── */
+.sdim-reasoning-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.reason-part {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 7px 9px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.reason-plus {
+  background: #f0fdf4;
+}
+
+.reason-minus {
+  background: #fff7ed;
+}
+
+.reason-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+}
+
+.reason-plus  .reason-tag { color: #065f46; }
+.reason-minus .reason-tag { color: #92400e; }
+
+.reason-text {
+  color: var(--text-muted);
+}
+
+/* ══ 移动端适配 ══ */
+@media (max-width: 480px) {
+  .final-hero { padding: 14px 16px; gap: 12px; }
+  .final-num { font-size: 52px; letter-spacing: -2px; }
+  .final-pts { font-size: 16px; }
+  .final-badge { font-size: 13px; }
+  .final-bar-wrap { min-width: 80px; }
+}

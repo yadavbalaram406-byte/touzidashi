@@ -1,0 +1,23 @@
+# 环境变量（含 API Key，绝对不能提交）
+.env
+
+# 数据目录（数据库和上传文件）
+data/touzidashi.db
+data/uploads/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+
+# Node
+client/node_modules/
+client/dist/
+
+# 系统
+.DS_Store
+*.log
