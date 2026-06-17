@@ -187,15 +187,27 @@ async def run_evaluation(evaluation_id: int, db: AsyncSession):
             from app.services.parser import parse_document, truncate_text
             file_paths = [fp.strip() for fp in (ev.file_path or "").split("\n") if fp.strip()]
             merged_parts = []
+            parse_errors = []
             for fp in file_paths:
                 ext = Path(fp).suffix.lstrip(".").lower()
                 try:
                     text, _ = await parse_document(fp, ext)
                     if text.strip():
                         merged_parts.append(text.strip())
+                    else:
+                        parse_errors.append(f"{Path(fp).name}: 未能提取到任何文字内容")
                 except Exception as e:
                     logger.warning(f"[eval:{evaluation_id}] Parse failed for {fp}: {e}")
+                    parse_errors.append(f"{Path(fp).name}: {e}")
             merged_text = truncate_text("\n\n---\n\n".join(merged_parts))
+
+            # 所有文件都解析失败/无内容 → 直接判失败，不要拿空文本去骗 LLM
+            if not merged_text.strip():
+                raise RuntimeError(
+                    "文档解析失败，未提取到任何内容：" + "；".join(parse_errors)
+                    if parse_errors else "文档解析失败，未提取到任何内容"
+                )
+
             ev.extracted_text = merged_text
             ev.text_length = len(merged_text)
             await db.commit()
