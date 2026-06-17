@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     database_url: str = "sqlite+aiosqlite:///data/touzidashi.db"
     max_upload_size_mb: int = 50
 
+    # 分享卡片用的站点根地址（og:image 需要绝对 URL）
+    site_base_url: str = "https://touzidashi.one-origin.ai"
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

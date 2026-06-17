@@ -172,6 +172,22 @@ async def get_evaluation(evaluation_id: int, db: AsyncSession = Depends(get_db))
     )
 
 
+@router.get("/{evaluation_id}/share-image.png")
+async def share_image(evaluation_id: int, db: AsyncSession = Depends(get_db)):
+    """分享卡片缩略图（og:image）。仅对已完成的评估生成。"""
+    from fastapi import Response
+    from app.services.share_image import generate_share_image
+
+    ev = await db.get(Evaluation, evaluation_id)
+    if not ev or ev.status != "completed" or ev.final_score is None:
+        raise HTTPException(status_code=404, detail="评估结果不存在或未完成")
+
+    png = generate_share_image(ev.id, ev.project_name, ev.final_score)
+    return Response(content=png, media_type="image/png",
+                    headers={"Cache-Control": "public, max-age=86400"})
+
+
+
 @router.delete("/{evaluation_id}")
 async def delete_evaluation(evaluation_id: int, db: AsyncSession = Depends(get_db)):
     ev = await db.get(Evaluation, evaluation_id)
