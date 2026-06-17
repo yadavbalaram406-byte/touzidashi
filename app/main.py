@@ -92,7 +92,7 @@ async def _render_share_page(evaluation_id: int, path_prefix: str, db: AsyncSess
         base = settings.site_base_url.rstrip("/")
         title = f"{ev.project_name} · {score}分"
         desc = f"{dec['icon']} 综合评分 {score}/100 ｜ {dec['label']}（{dec['chinese']}）"
-        image = f"{base}/api/evaluations/{ev.id}/share-image.png"
+        image = f"{base}/api/evaluations/{ev.id}/share-image"
         url = f"{base}{path_prefix}/{ev.id}"
         raw = _inject_meta(raw, title=title, desc=desc, image=image, url=url)
     return HTMLResponse(raw)

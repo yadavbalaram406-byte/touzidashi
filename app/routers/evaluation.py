@@ -172,9 +172,10 @@ async def get_evaluation(evaluation_id: int, db: AsyncSession = Depends(get_db))
     )
 
 
-@router.get("/{evaluation_id}/share-image.png")
+@router.get("/{evaluation_id}/share-image")
 async def share_image(evaluation_id: int, db: AsyncSession = Depends(get_db)):
-    """分享卡片缩略图（og:image）。仅对已完成的评估生成。"""
+    """分享卡片缩略图（og:image）。仅对已完成的评估生成。
+    注意：URL 不带 .png 后缀，避免 Nginx 把它当静态文件拦截。"""
     from fastapi import Response
     from app.services.share_image import generate_share_image
 
