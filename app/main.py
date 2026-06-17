@@ -60,8 +60,10 @@ def _inject_meta(html_text: str, *, title: str, desc: str, image: str, url: str)
     site_name = "from one origin · AI投资大师"
     icon_tags = ""
     if _icon_path.exists():
-        # 移除构建产物里原有的 favicon，避免与自定义 icon 冲突（微信可能优先用排在前的）
-        html_text = re.sub(r'<link[^>]*rel="(?:icon|apple-touch-icon)"[^>]*>', "", html_text, flags=re.I)
+        # 移除构建产物里原有的 favicon，避免与自定义 icon 冲突。
+        # 注意：内联 data:URI 图标的值可能含 '>'，必须按引号边界匹配，不能用 [^>]。
+        html_text = re.sub(r'<link[^>]*?href="data:[^"]*"[^>]*?/?>', "", html_text, flags=re.I)
+        html_text = re.sub(r'<link[^>]*?rel=["\'](?:icon|apple-touch-icon)["\'][^>]*?/?>', "", html_text, flags=re.I)
         icon_tags = (
             '<link rel="icon" href="/icon.png" />'
             '<link rel="apple-touch-icon" href="/icon.png" />'
