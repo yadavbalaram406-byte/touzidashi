@@ -4,6 +4,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.database import init_db
 from app.config import get_settings
@@ -44,4 +45,16 @@ async def health():
 # 托管前端静态文件（生产环境 Dockerfile 构建后存在）
 _static_dir = Path("client/dist")
 if _static_dir.exists():
-    app.mount("/", StaticFiles(directory=str(_static_dir), html=True), name="static")
+    class SPAStaticFiles(StaticFiles):
+        """SPA 深链接支持：真实文件正常返回，找不到的路径回退 index.html，
+        交给前端路由（BrowserRouter）处理，避免 /detail/7、/result/7 直接 404。"""
+
+        async def get_response(self, path, scope):
+            try:
+                return await super().get_response(path, scope)
+            except StarletteHTTPException as ex:
+                if ex.status_code == 404:
+                    return await super().get_response("index.html", scope)
+                raise
+
+    app.mount("/", SPAStaticFiles(directory=str(_static_dir), html=True), name="static")
